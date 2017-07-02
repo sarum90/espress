@@ -12,9 +12,9 @@ addons:
       - g++-7
 
 before_install:
-  - cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-boost-2017-07-01_182026.tar.gz | tar xz
-  - cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-mettle-2017-07-01_182547.tar.gz | tar xz
-  - ldconfig
+  - cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-boost-2017-07-01_182026.tar.gz | sudo tar xz
+  - cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-mettle-2017-07-01_182547.tar.gz | sudo tar xz
+  - sudo ldconfig
 
 script:
   make test
