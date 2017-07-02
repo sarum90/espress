@@ -17,7 +17,6 @@ struct simple_fake_writer: public writer {
 };
 
 suite<> basic("bufferred writer suite", [](auto &_) {
-
   _.test("reduces writes", []() {
     buffered_writer<simple_fake_writer> bw;
     simple_fake_writer sfw;
