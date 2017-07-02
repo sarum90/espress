@@ -1,0 +1,13 @@
+dist: trusty
+sudo: false
+
+before_install:
+  - add-apt-repository ppa:ubuntu-toolchain-r/test
+  - apt-get update -q
+  - apt-get install -y gcc-7 g++-7
+  - cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-boost-2017-07-01_182026.tar.gz | tar xz
+  - cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-mettle-2017-07-01_182547.tar.gz | tar xz
+  - ldconfig
+
+script:
+  make test

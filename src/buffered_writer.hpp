@@ -38,6 +38,10 @@ public:
     }
   }
 
+  inner_writer* inner() {
+    return &inner_;
+  }
+
 private:
   inner_writer inner_;
   std::string_view::size_type index_ = 0;
