@@ -3,6 +3,8 @@
 import collections
 import os
 import sys
+result = [x for x in os.walk('./src') if True]#x.endswith('.cpp')]
+print result
 
 CoverageInfo = collections.namedtuple(
         'CoverageInfo', ['percentage', 'report', 'filename'])
@@ -38,8 +40,11 @@ def gcov_chunks(filename):
 
 def process(output, summary_dir):
     full_coverage = True
+    files = set()
     for c in gcov_chunks(output):
         x = handle_chunk(c)
+        fn = os.path.normpath(os.path.join(summary_dir, x.filename))
+        files.add(fn)
         if x.percentage < 100:
             full_coverage = False
             p = os.path.join(summary_dir, x.report)
@@ -48,10 +53,8 @@ def process(output, summary_dir):
                     e, l, line = line.split(':', 2)
                     if '#' not in e:
                         continue
-                    print '%s:%d: Line not covered by tests.' % (
-                        os.path.normpath(os.path.join(summary_dir, x.filename)),
-                        int(l),
-                    )
+                    print '%s:%d: Line not covered by tests.' % (fn, int(l))
+    print files
     if not full_coverage:
         print "Less than 100% coverage"
         sys.exit(-1)
