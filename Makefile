@@ -4,9 +4,23 @@ FILES= \
   src/json.cpp \
   src/main.cpp
 
-CXXFLAGS=-std=c++17 -O2 -g
+CXXFLAGS=-std=c++17 -O2 -g -I src/
+CXXCOVFLAGS=-std=c++17 -O0 --coverage -g -DCOVERAGE -I ../../src/
 
 TESTFLAGS=-lmettle
+
+TEST_EXECUTABLES = \
+	test_buffered_writer \
+	util/test_write
+
+TEST_EXECUTABLES_LOC = $(addprefix out/test/, $(TEST_EXECUTABLES))
+
+# N.B.: The way coverage works currently, you can't have two test targets with
+# the same name, even if they are in different directories.
+TEST_EXECUTABLES_BASENAME = $(notdir $(TEST_EXECUTABLES))
+TEST_COVERAGE_EXECUTABLES = $(addsuffix _cov, $(TEST_EXECUTABLES))
+TEST_COVERAGE_EXECUTABLES_DEP = $(addprefix out/cov/, $(TEST_COVERAGE_EXECUTABLES))
+TEST_COVERAGE_EXECUTABLES_CWD = $(addprefix ./, $(TEST_COVERAGE_EXECUTABLES))
 
 default: test
 
@@ -16,8 +30,40 @@ all: test
 	./main
 
 .PHONY: test
-test: test_buffered_writer
-	mettle ./test_buffered_writer
+test: $(TEST_EXECUTABLES_LOC)
+	mettle $(TEST_EXECUTABLES_LOC)
 
-test_buffered_writer: src/test_buffered_writer.cpp
-	$(CXX) $(CXXFLAGS) src/test_buffered_writer.cpp -o test_buffered_writer $(TESTFLAGS)
+.PHONY: coverage
+coverage: out/cov/gcov.stdout
+	python tools/check_coverage.py out/cov/gcov.stdout
+
+out/cov/gcov.stdout: $(TEST_COVERAGE_EXECUTABLES_DEP)
+	cd out/cov && rm -f *.gcda
+	cd out/cov && mettle $(TEST_COVERAGE_EXECUTABLES_CWD)
+	mkdir -p out/cov && cd out/cov && gcov-7 -l -r -s ../../src/ $(TEST_EXECUTABLES_BASENAME) | tee gcov.stdout
+
+out/test/%: src/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $< -o $@ $(TESTFLAGS)
+
+#out/test/test_buffered_writer: src/test_buffered_writer.cpp
+#	@mkdir -p out/test
+#	$(CXX) $(CXXFLAGS) src/test_buffered_writer.cpp -o out/test/test_buffered_writer $(TESTFLAGS)
+
+#out/test/test_write: src/util/test_write.cpp
+#	@mkdir -p out/test
+#	$(CXX) $(CXXFLAGS) src/util/test_write.cpp -o out/test/test_write $(TESTFLAGS)
+
+out/cov/test_buffered_writer_cov: src/test_buffered_writer.cpp
+	@mkdir -p out/cov
+	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../src/test_buffered_writer.cpp -o test_buffered_writer_cov $(TESTFLAGS)
+
+out/cov/util/test_write_cov: src/util/test_write.cpp
+	@mkdir -p out/cov/util
+	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../src/util/test_write.cpp -o util/test_write_cov $(TESTFLAGS)
+
+clean:
+	rm -f main
+	rm -f test_buffered_writer
+	rm -rf out
+

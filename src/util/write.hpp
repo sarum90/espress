@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../writer.hpp"
+#include "writer.hpp"
 
 namespace espress {
 namespace util {

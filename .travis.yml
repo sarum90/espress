@@ -17,4 +17,5 @@ before_install:
   - sudo ldconfig
 
 script:
-  make test
+  - make test
+  - make coverage

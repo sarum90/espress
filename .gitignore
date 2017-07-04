@@ -32,6 +32,7 @@
 *.app
 main
 test_buffered_writer
+test_buffered_writer_cov
 
 # Vim temporary files
 *.swn

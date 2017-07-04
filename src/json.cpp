@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include "util/variant.hpp"
-#include "util/writer.hpp"
+#include "util/write.hpp"
 
 namespace espress {
 
