@@ -11,6 +11,7 @@ TESTFLAGS=-lmettle
 
 TEST_EXECUTABLES = \
 	test_buffered_writer \
+	util/test_assert \
 	util/test_write
 
 TEST_EXECUTABLES_LOC = $(addprefix out/test/, $(TEST_EXECUTABLES))
@@ -46,24 +47,11 @@ out/test/%: src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $< -o $@ $(TESTFLAGS)
 
-#out/test/test_buffered_writer: src/test_buffered_writer.cpp
-#	@mkdir -p out/test
-#	$(CXX) $(CXXFLAGS) src/test_buffered_writer.cpp -o out/test/test_buffered_writer $(TESTFLAGS)
-
-#out/test/test_write: src/util/test_write.cpp
-#	@mkdir -p out/test
-#	$(CXX) $(CXXFLAGS) src/util/test_write.cpp -o out/test/test_write $(TESTFLAGS)
-
-out/cov/test_buffered_writer_cov: src/test_buffered_writer.cpp
-	@mkdir -p out/cov
-	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../src/test_buffered_writer.cpp -o test_buffered_writer_cov $(TESTFLAGS)
-
-out/cov/util/test_write_cov: src/util/test_write.cpp
-	@mkdir -p out/cov/util
-	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../src/util/test_write.cpp -o util/test_write_cov $(TESTFLAGS)
+out/cov/%_cov: src/%.cpp
+	@mkdir -p $(dir $@)
+	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../$< -o ../../$@ $(TESTFLAGS)
 
 clean:
 	rm -f main
-	rm -f test_buffered_writer
 	rm -rf out
 

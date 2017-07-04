@@ -31,8 +31,7 @@
 *.out
 *.app
 main
-test_buffered_writer
-test_buffered_writer_cov
+out
 
 # Vim temporary files
 *.swn

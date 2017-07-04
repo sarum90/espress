@@ -25,7 +25,7 @@ public:
     if (s.size() > buffer_size) {
       return inner_.write(s);
     }
-    util::assert(index_ + s.size() <= buffer_size, "Error in buffer logic");
+    util::eassert(index_ + s.size() <= buffer_size, "Error in buffer logic");
     memcpy(&buffer_[index_], &s[0], s.size());
     index_ += s.size();
     return s.size();
