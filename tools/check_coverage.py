@@ -3,8 +3,6 @@
 import collections
 import os
 import sys
-result = [x for x in os.walk('./src') if True]#x.endswith('.cpp')]
-print result
 
 CoverageInfo = collections.namedtuple(
         'CoverageInfo', ['percentage', 'report', 'filename'])
@@ -54,7 +52,14 @@ def process(output, summary_dir):
                     if '#' not in e:
                         continue
                     print '%s:%d: Line not covered by tests.' % (fn, int(l))
-    print files
+    cp = os.path.commonprefix(files)
+    allfiles = set([os.path.join(x[0], y) for x in os.walk(cp) for y in x[2]])
+    missing = allfiles - files
+    if missing:
+        full_coverage = False
+        print "Missing coverage info for the following:"
+        print '\n'.join(sorted(missing))
+
     if not full_coverage:
         print "Less than 100% coverage"
         sys.exit(-1)
