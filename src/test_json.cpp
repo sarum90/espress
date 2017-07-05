@@ -54,11 +54,8 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
   });
 
   _.test("TODO: remove this", []() {
-    expect(
-        []() {
-          buffer b;
-          to_json(jsvalue::array(nullptr), &b);
-        },
-        thrown<std::runtime_error>());
+    buffer b;
+    expect([&]() { to_json(jsvalue::array(nullptr), &b); },
+           thrown<std::runtime_error>());
   });
 });

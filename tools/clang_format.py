@@ -33,6 +33,9 @@ def _run_format(dirname, change, tmpdir):
         print "Run `make format` to automaticall fix them"
         sys.exit(-1)
 
+    if not change:
+        print "Formatting correct!"
+
 def run_format(dirname, change):
     tmpdir = tempfile.mkdtemp()
     try:
