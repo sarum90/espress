@@ -38,7 +38,7 @@ all: test
 	./main
 
 .PHONY: travis
-travis: test coverage
+travis: test coverage check-format
 
 .PHONY: test
 test: $(TEST_EXECUTABLES_LOC)
@@ -47,6 +47,13 @@ test: $(TEST_EXECUTABLES_LOC)
 .PHONY: coverage
 coverage: out/cov/gcov.stdout
 	python tools/check_coverage.py out/cov/gcov.stdout
+
+.PHONY: format
+format:
+
+.PHONY: check-format
+check-format:
+	python tools/clang_format.py src/
 
 out/cov/gcov.stdout: $(TEST_COVERAGE_EXECUTABLES_DEP)
 	cd out/cov && rm -f *.gcda
