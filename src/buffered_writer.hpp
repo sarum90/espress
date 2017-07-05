@@ -10,17 +10,17 @@ namespace espress {
 // Note that for simplicity, this implementation will block rather than return
 // partial writes when flushing the buffer.
 template <class inner_writer>
-class buffered_writer: public writer {
+class buffered_writer : public writer {
 private:
   static constexpr int buffer_size = 4096;
 
 public:
-  template <class ... T>
-  buffered_writer(T && ... args): inner_(std::forward<T>(args)...) {}
+  template <class... T>
+  buffered_writer(T &&... args) : inner_(std::forward<T>(args)...) {}
 
   int write(std::string_view s) final override {
     if (index_ + s.size() > buffer_size) {
-      flush(); // blocks until flushed.
+      flush();  // blocks until flushed.
     }
     if (s.size() > buffer_size) {
       return inner_.write(s);
@@ -38,9 +38,7 @@ public:
     }
   }
 
-  inner_writer* inner() {
-    return &inner_;
-  }
+  inner_writer *inner() { return &inner_; }
 
 private:
   inner_writer inner_;
@@ -48,4 +46,4 @@ private:
   char buffer_[buffer_size];
 };
 
-} // namespace espress
+}  // namespace espress

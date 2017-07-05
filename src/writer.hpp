@@ -16,9 +16,9 @@ public:
   virtual int write(std::string_view s) = 0;
 };
 
-class file_writer: public writer {
+class file_writer : public writer {
 public:
-  file_writer(int fd): fd_(fd) {}
+  file_writer(int fd) : fd_(fd) {}
 
   int write(std::string_view s) final override {
     int r = ::write(fd_, &s[0], s.size());
@@ -34,5 +34,4 @@ private:
   const int fd_;
 };
 
-
-} // namespace espress
+}  // namespace espress

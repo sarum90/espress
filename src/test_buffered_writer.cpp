@@ -7,8 +7,8 @@
 using namespace espress;
 using namespace mettle;
 
-struct simple_fake_writer: public writer {
-  int write(std::string_view s)  final override {
+struct simple_fake_writer : public writer {
+  int write(std::string_view s) final override {
     written_data += s;
     write_calls++;
     return s.size();
@@ -18,7 +18,6 @@ struct simple_fake_writer: public writer {
   int write_calls = 0;
 };
 
-
 test_suite<> buffered_writer_tests("bufferred writer suite", [](auto &_) {
   _.test("reduces writes", []() {
     buffered_writer<simple_fake_writer> bw;
@@ -27,7 +26,7 @@ test_suite<> buffered_writer_tests("bufferred writer suite", [](auto &_) {
 
     auto index_to_char = [](int i) -> char { return 'a' + (i % 26); };
 
-    for(int i = 0; i < write_count; i++) {
+    for (int i = 0; i < write_count; i++) {
       std::string s{index_to_char(i)};
       bw.write(s);
       sfw.write(s);
@@ -58,8 +57,9 @@ test_suite<> buffered_writer_tests("bufferred writer suite", [](auto &_) {
     bw.write(separator);
     bw.write(small);
     bw.flush();
-    expect(bw.inner()->written_data, equal_to(
-          small + separator + mid + separator + large + separator + mid + separator + small));
+    expect(bw.inner()->written_data,
+           equal_to(small + separator + mid + separator + large + separator +
+                    mid + separator + small));
   });
 
 });

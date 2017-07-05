@@ -14,6 +14,5 @@ inline void eassert(bool must_be_true, std::string_view message) {
   }
 }
 
-} // namespace util
-} // namespace espress
-
+}  // namespace util
+}  // namespace espress

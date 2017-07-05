@@ -8,7 +8,7 @@ namespace util {
 // Simple utility to pass a bunch of overloaded lambdas to std::visit.
 //
 // Intended use:
-//   
+//
 //   std::visit(
 //    util::overloaded{
 //      [](bool b){ return b ? "true" : "false"; }
@@ -17,8 +17,12 @@ namespace util {
 //    }, variant_object);
 //
 //
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+template <class... Ts>
+struct overloaded : Ts... {
+  using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
 
 }  // namespace util
 }  // namespace espress

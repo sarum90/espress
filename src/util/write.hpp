@@ -6,7 +6,7 @@ namespace espress {
 namespace util {
 
 // TODO(correct error type).
-inline void write_all(writer* w, std::string_view s) {
+inline void write_all(writer *w, std::string_view s) {
   int i = 0;
   while (i < s.size()) {
     int written = w->write(s.substr(i));
@@ -17,6 +17,5 @@ inline void write_all(writer* w, std::string_view s) {
   }
 }
 
-} // namespace util
-} // namespace espress
-
+}  // namespace util
+}  // namespace espress
