@@ -50,6 +50,7 @@ coverage: out/cov/gcov.stdout
 
 .PHONY: format
 format:
+	python tools/clang_format.py -i src/
 
 .PHONY: check-format
 check-format:
