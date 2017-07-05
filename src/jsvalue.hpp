@@ -21,6 +21,12 @@ private:
 // Javascript string representation. Does not own the underlying string.
 class jsstring {
 public:
+  template<int N>
+  jsstring(const char (&c)[N]): string_{c, N-1}{}
+
+  std::string_view string_view() {
+    return string_;
+  }
 
 private:
   std::string_view string_;

@@ -10,6 +10,7 @@ addons:
     packages:
       - gcc-7
       - g++-7
+      - clang-format-3.9
 
 before_install:
   - (cd /usr/local && curl https://storage.googleapis.com/mewert-bindata/gcc-7-boost-2017-07-01_182026.tar.gz | sudo tar xz)
@@ -17,5 +18,4 @@ before_install:
   - sudo ldconfig
 
 script:
-  - make test
-  - make coverage
+  - make -j4 travis

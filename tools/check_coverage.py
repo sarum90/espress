@@ -7,6 +7,10 @@ import sys
 CoverageInfo = collections.namedtuple(
         'CoverageInfo', ['percentage', 'report', 'filename'])
 
+_NOCOV_FILES = frozenset([
+    'main.cpp'
+])
+
 def handle_chunk(chunk):
     # Sample chunk, array of 3 lines that look like:
     #
@@ -53,7 +57,7 @@ def process(output, summary_dir):
                         continue
                     print '%s:%d: Line not covered by tests.' % (fn, int(l))
     cp = os.path.commonprefix(files)
-    allfiles = set([os.path.join(x[0], y) for x in os.walk(cp) for y in x[2]])
+    allfiles = set([os.path.join(x[0], y) for x in os.walk(cp) for y in x[2] if y.endswith('.cpp') and y not in _NOCOV_FILES])
     missing = allfiles - files
     if missing:
         full_coverage = False
