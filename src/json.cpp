@@ -70,7 +70,7 @@ public:
   void operator()(jsarray_view a) {
     util::write_all(writer_, "[");
     bool first = true;
-    for(auto js: a) {
+    for (auto js : a) {
       if (first) {
         first = false;
       } else {
@@ -84,7 +84,7 @@ public:
   void operator()(jsobject_view o) {
     util::write_all(writer_, "{");
     bool first = true;
-    for (auto[k,v]: o) {
+    for (auto[k, v] : o) {
       if (first) {
         first = false;
       } else {

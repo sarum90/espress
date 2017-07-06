@@ -22,7 +22,7 @@ public:
 
   std::string_view string_view() { return string_; }
 
-  inline bool operator<(const jsstring& other) const {
+  inline bool operator<(const jsstring &other) const {
     return string_ < other.string_;
   }
 
@@ -35,7 +35,7 @@ public:
   typedef std::vector<jsvalue>::iterator iterator;
   typedef std::vector<jsvalue>::const_iterator const_iterator;
 
-  jsarray_view(jsarray* array): array_(array){}
+  jsarray_view(jsarray *array) : array_(array) {}
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -48,7 +48,7 @@ class jsobject_view {
 public:
   typedef std::map<jsstring, jsvalue>::const_iterator const_iterator;
 
-  jsobject_view(jsobject* object): object_(object){}
+  jsobject_view(jsobject *object) : object_(object) {}
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -130,17 +130,11 @@ public:
   typedef jsarray_view::iterator iterator;
   typedef jsarray_view::const_iterator const_iterator;
 
-  void push_back(jsvalue v) {
-    values_.push_back(v);
-  }
+  void push_back(jsvalue v) { values_.push_back(v); }
 
-  const_iterator begin() const {
-    return values_.begin();
-  }
+  const_iterator begin() const { return values_.begin(); }
 
-  const_iterator end() const {
-    return values_.end();
-  }
+  const_iterator end() const { return values_.end(); }
 
 private:
   std::vector<jsvalue> values_;
@@ -151,17 +145,11 @@ class jsobject {
 public:
   typedef jsobject_view::const_iterator const_iterator;
 
-  void set(jsstring s, jsvalue v)  {
-    key_values_.insert({s, v});
-  }
+  void set(jsstring s, jsvalue v) { key_values_.insert({s, v}); }
 
-  const_iterator begin() const {
-    return key_values_.begin();
-  }
+  const_iterator begin() const { return key_values_.begin(); }
 
-  const_iterator end() const {
-    return key_values_.end();
-  }
+  const_iterator end() const { return key_values_.end(); }
 
 private:
   // TODO: Javascript objects can have prototypes, expand this to account for
