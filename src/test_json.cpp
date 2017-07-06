@@ -1,7 +1,5 @@
 #include "json.hpp"
 
-#include <mettle.hpp>
-
 #include "test/common.hpp"
 
 #include "jsvalue.hpp"
@@ -53,9 +51,36 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
     expect(b.data, equal_to("\"\\\\starting\""));
   });
 
-  _.test("TODO: remove this", []() {
-    buffer b;
-    expect([&]() { to_json(jsvalue::array(nullptr), &b); },
-           thrown<std::runtime_error>());
+  _.test("date", []() {
+    for (auto[in, out] :
+         {std::make_pair(1499280807982, "2017-07-05T18:53:27.982Z"),
+          std::make_pair(949381200000, "2000-02-01T05:00:00.000Z")}) {
+      auto t = std::chrono::milliseconds(in);
+      jsdate d{t};
+      buffer b;
+      to_json(jsvalue::date(d), &b);
+      expect(b.data, equal_to(out));
+    }
   });
+
+  _.test("array", []() {
+    jsarray arr;
+    arr.push_back(jsvalue::number(45));
+    arr.push_back(jsvalue::string("cat"));
+    arr.push_back(jsvalue::boolean(false));
+    buffer b;
+    to_json(jsvalue::array(&arr), &b);
+    expect(b.data, equal_to("[45,\"cat\",false]"));
+  });
+
+  _.test("object", []() {
+    jsobject o;
+    o.set("cat", jsvalue::number(111));
+    o.set("mouse", jsvalue::string("hi"));
+    o.set("dog", jsvalue::boolean(true));
+    buffer b;
+    to_json(jsvalue::object(&o), &b);
+    expect(b.data, equal_to("{\"cat\":111,\"dog\":true,\"mouse\":\"hi\"}"));
+  });
+
 });

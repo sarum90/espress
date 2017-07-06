@@ -14,8 +14,14 @@ public:
   explicit json_visitor(writer *w) : writer_(w) {}
 
   void operator()(double d) {
-    auto s = std::to_string(d);
-    util::write_all(writer_, s);
+    long int i = d;
+    if (i == d) {
+      auto s = std::to_string(i);
+      util::write_all(writer_, s);
+    } else {
+      auto s = std::to_string(d);
+      util::write_all(writer_, s);
+    }
   }
 
   void operator()(bool b) { util::write_all(writer_, b ? "true" : "false"); }
@@ -40,9 +46,55 @@ public:
     util::write_all(writer_, "\"");
   }
 
-  template <class T>
-  void operator()(T &&t) {
-    throw std::runtime_error("Unhandled visit type");
+  void operator()(jsdate d) {
+    auto date_time = d.to_tm();
+    auto ms = d.time_since_epoch() % std::chrono::seconds{1};
+    // TODO: figure out what to do here, probably:
+    // https://stackoverflow.com/questions/10286204/the-right-json-date-format
+    constexpr size_t buff_size = 128;
+    char buffer[buff_size];
+    size_t bytes = snprintf(buffer,
+                            buff_size,
+                            "%d-%02d-%02dT%02d:%02d:%02d.%03ldZ",
+                            date_time.tm_year + 1900,
+                            date_time.tm_mon + 1,
+                            date_time.tm_mday,
+                            date_time.tm_hour,
+                            date_time.tm_min,
+                            date_time.tm_sec,
+                            ms.count());
+    util::eassert(bytes >= 0 && bytes < buff_size, "Error running snprintf.");
+    util::write_all(writer_, {buffer, bytes});
+  }
+
+  void operator()(jsarray_view a) {
+    util::write_all(writer_, "[");
+    bool first = true;
+    for(auto js: a) {
+      if (first) {
+        first = false;
+      } else {
+        util::write_all(writer_, ",");
+      }
+      js.visit(*this);
+    }
+    util::write_all(writer_, "]");
+  }
+
+  void operator()(jsobject_view o) {
+    util::write_all(writer_, "{");
+    bool first = true;
+    for (auto[k,v]: o) {
+      if (first) {
+        first = false;
+      } else {
+        util::write_all(writer_, ",");
+      }
+      (*this)(k);
+      util::write_all(writer_, ":");
+      v.visit(*this);
+    }
+    util::write_all(writer_, "}");
   }
 
 private:

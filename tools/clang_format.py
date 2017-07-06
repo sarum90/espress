@@ -30,7 +30,7 @@ def _run_format(dirname, change, tmpdir):
     if failed:
         for f in failed:
             print "%s has formatting errors" % f
-        print "Run `make format` to automaticall fix them"
+        print "Run `make format` to automatically fix them"
         sys.exit(-1)
 
     if not change:

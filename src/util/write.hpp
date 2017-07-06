@@ -7,7 +7,7 @@ namespace util {
 
 // TODO(correct error type).
 inline void write_all(writer *w, std::string_view s) {
-  int i = 0;
+  size_t i = 0;
   while (i < s.size()) {
     int written = w->write(s.substr(i));
     if (written < 1) {

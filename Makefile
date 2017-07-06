@@ -1,20 +1,22 @@
 CXX=g++-7
 
 COMMON_FILES= \
-	json.cpp
+	json.cpp \
+	jsvalue.cpp
 
 FILES= \
   $(COMMON_FILES) \
   main.cpp
 
-CXXFLAGS=-std=c++17 -O2 -g -I src/
-CXXCOVFLAGS=-std=c++17 -O0 --coverage -g -DCOVERAGE -I ../../src/
+CXXFLAGS=-std=c++17 -O2 -g -I src/ -Wall -Werror
+CXXCOVFLAGS=-std=c++17 -O0 --coverage -g -DCOVERAGE -I ../../src/ -Wall -Werror
 
 TESTFLAGS=-lmettle
 
 TEST_EXECUTABLES = \
 	test_buffered_writer \
 	test_json \
+	test_jsvalue \
 	util/test_assert \
 	util/test_write
 
