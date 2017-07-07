@@ -7,23 +7,23 @@ namespace espress {
 
 class read_buffer {
 public:
-  read_buffer(){}
+  read_buffer() {}
 
-  read_buffer(char * c, size_t size): c_(c), size_(size){}
+  read_buffer(char* c, size_t size) : c_(c), size_(size) {}
 
   // only valid until s is modified.
-  read_buffer(std::string& s): c_(&s[0]), size_(s.size()){}
+  read_buffer(std::string& s) : c_(&s[0]), size_(s.size()) {}
 
   inline read_buffer substr(size_t pos) {
     util::eassert(pos <= size_, "substr off end of read_buffer.");
-    return read_buffer{c_ + pos, size_-pos};
+    return read_buffer{c_ + pos, size_ - pos};
   }
 
-  char * data() {return c_;}
-  size_t size() {return size_;}
+  char* data() { return c_; }
+  size_t size() { return size_; }
 
 private:
-  char * c_ = nullptr;
+  char* c_ = nullptr;
   size_t size_ = 0;
 };
 
@@ -53,4 +53,4 @@ private:
 
 typedef file_reader_impl<espress::syscalls> file_reader;
 
-} // namespace espress
+}  // namespace espress

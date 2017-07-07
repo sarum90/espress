@@ -12,10 +12,10 @@ struct bad_reader {
   }
 };
 
-test_suite<> failed_reads_test("file_reader tests for failed reads.", [](auto &_) {
-  _.test("EIO test", [](){
+test_suite<> failed_reads_test("file_reader failed reads.", [](auto &_) {
+  _.test("EIO test", []() {
     file_reader_impl<bad_reader> fr(0);
     std::string buff(100, '\0');
-    expect([&](){fr.read(buff);}, thrown<std::runtime_error>());
+    expect([&]() { fr.read(buff); }, thrown<std::runtime_error>());
   });
 });

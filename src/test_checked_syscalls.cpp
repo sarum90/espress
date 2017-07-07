@@ -13,6 +13,7 @@ struct pipe_error_syscalls : public syscalls {
 };
 
 test_suite<> checked_syscalls_tests("tests for checked_syscalls", [](auto &_) {
-    int fds[2];
-    expect([&](){ checked_syscalls_impl<pipe_error_syscalls>::pipe(fds); }, thrown<std::system_error>("Too many open files"));
+  int fds[2];
+  expect([&]() { checked_syscalls_impl<pipe_error_syscalls>::pipe(fds); },
+         thrown<std::system_error>("Too many open files"));
 });

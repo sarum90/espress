@@ -8,7 +8,7 @@ pipe::pipe() {
   int fds[2];
   checked_syscalls::pipe(fds);
   read_fd_ = fds[0];
-  write_fd_ =  fds[1];
+  write_fd_ = fds[1];
 }
 
 pipe::~pipe() {
@@ -41,5 +41,4 @@ pipe& pipe::operator=(pipe&& other) {
   other.write_fd_ = -1;
   return (*this);
 }
-
 }

@@ -13,7 +13,6 @@ test_suite<> util_read_tests("read util tests", [](auto &_) {
   _.test("raises error on bad read", []() {
     bad_reader bad;
     std::string s(100, '\0');
-    expect([&]() { util::read_all(&bad, s); },
-           thrown<std::runtime_error>());
+    expect([&]() { util::read_all(&bad, s); }, thrown<std::runtime_error>());
   });
 });

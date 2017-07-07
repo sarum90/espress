@@ -12,9 +12,9 @@ struct bad_writer {
   }
 };
 
-test_suite<> failed_writes_test("file_writer tests for failed writes.", [](auto &_) {
-  _.test("EBADF test", [](){
+test_suite<> failed_writes_test("file_writer failed writes.", [](auto &_) {
+  _.test("EBADF test", []() {
     file_writer_impl<bad_writer> fw(0);
-    expect([&](){fw.write("cat");}, thrown<std::runtime_error>());
+    expect([&]() { fw.write("cat"); }, thrown<std::runtime_error>());
   });
 });
