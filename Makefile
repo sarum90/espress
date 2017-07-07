@@ -2,7 +2,8 @@ CXX=g++-7
 
 COMMON_FILES= \
 	json.cpp \
-	jsvalue.cpp
+	jsvalue.cpp \
+	pipe.cpp
 
 FILES= \
   $(COMMON_FILES) \
@@ -15,9 +16,14 @@ TESTFLAGS=-lmettle
 
 TEST_EXECUTABLES = \
 	test_buffered_writer \
+	test_checked_syscalls \
 	test_json \
 	test_jsvalue \
+	test_pipe \
+	test_reader \
+	test_writer \
 	util/test_assert \
+	util/test_read \
 	util/test_write
 
 COMMON_OBJ=$(patsubst %.cpp, %.o, $(COMMON_FILES))
@@ -65,7 +71,7 @@ out/cov/gcov.stdout: $(TEST_COVERAGE_EXECUTABLES_DEP)
 
 out/test/%: out/test/obj/%.o $(TEST_COMMON_OBJ)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $< -o $@ $(TESTFLAGS) $(addprefix src/, $(COMMON_FILES))
+	$(CXX) $(CXXFLAGS) $< -o $@ $(TESTFLAGS) $(TEST_COMMON_OBJ)
 
 out/test/obj/%.o: src/%.cpp out/test/deps/%.d
 	@mkdir -p $(dir $@)
@@ -73,10 +79,9 @@ out/test/obj/%.o: src/%.cpp out/test/deps/%.d
 	$(CXX) -c $(CXXFLAGS) $< -o $@ -MT $@ -MMD -MP -MF out/test/deps/$*.Td
 	@mv out/test/deps/$*.Td out/test/deps/$*.d
 
-
 out/cov/%_cov: out/cov/obj/%.o $(TEST_COVERAGE_COMMON_OBJ)
 	@mkdir -p $(dir $@)
-	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../$< -o ../../$@ $(TESTFLAGS) ../../$(TEST_COVERAGE_COMMON_OBJ)
+	cd out/cov && $(CXX) $(CXXCOVFLAGS) ../../$< -o ../../$@ $(TESTFLAGS) $(addprefix ../../, $(TEST_COVERAGE_COMMON_OBJ))
 
 out/cov/obj/%.o: src/%.cpp out/cov/deps/%.d
 	@mkdir -p $(dir $@)

@@ -53,8 +53,8 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
 
   _.test("date", []() {
     for (auto[in, out] :
-         {std::make_pair(1499280807982, "2017-07-05T18:53:27.982Z"),
-          std::make_pair(949381200000, "2000-02-01T05:00:00.000Z")}) {
+         {std::make_pair(1499280807982, "\"2017-07-05T18:53:27.982Z\""),
+          std::make_pair(949381200000, "\"2000-02-01T05:00:00.000Z\"")}) {
       auto t = std::chrono::milliseconds(in);
       jsdate d{t};
       buffer b;
@@ -83,4 +83,55 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
     expect(b.data, equal_to("{\"cat\":111,\"dog\":true,\"mouse\":\"hi\"}"));
   });
 
+  _.test("nested", []() {
+    jsarray a1;
+    a1.push_back(jsvalue::date(std::chrono::milliseconds(1500000000000)));
+    a1.push_back(jsvalue::boolean(true));
+    a1.push_back(jsvalue::string("\\mouse\""));
+    a1.push_back(jsvalue::number(1e12));
+    jsobject o1;
+    o1.set("arr", jsvalue::array(&a1));
+    o1.set("num", jsvalue::number(-12.125));
+    o1.set("bool", jsvalue::boolean(true));
+    jsarray a2;
+    a2.push_back(jsvalue::string("Hello World!"));
+    jsarray a3;
+    a3.push_back(jsvalue::object(&o1));
+    a3.push_back(jsvalue::array(&a2));
+    jsobject o2;
+    o2.set("cat", jsvalue::string("mouse"));
+    o2.set("abc123e", jsvalue::number(-12345));
+    jsobject o3;
+    o3.set("a", jsvalue::array(&a3));
+    o3.set("b", jsvalue::object(&o2));
+    o3.set("_cde_", jsvalue::boolean(false));
+
+    buffer b;
+    to_json(jsvalue::object(&o3), &b);
+    expect(b.data,
+           equal_to(
+               "{\"_cde_\":false,"
+               "\"a\":["
+               "{\"arr\":[\"2017-07-14T02:40:00.000Z\",true,\"\\\\mouse\\\"\","
+               "1000000000000],"
+               "\"bool\":true,\"num\":-12.125000},"
+               "[\"Hello World!\"]],"
+               "\"b\":{\"abc123e\":-12345,\"cat\":\"mouse\"}}"));
+  });
+
+  _.test("tojs", []() {
+    buffer b;
+    jsarray a;
+    a.push_back(jsvalue::boolean(true));
+    a.push_back(jsvalue::boolean(false));
+    jsobject o;
+    o.set("array", jsvalue::array(&a));
+    o.set("number", jsvalue::number(123));
+    o.set("date", jsvalue::date(std::chrono::milliseconds{1500000000000}));
+    o.set("string", jsvalue::string("cat"));
+    to_js(jsvalue::object(&o), &b);
+    expect(b.data,
+           equal_to("{\"array\":[true,false],\"date\":new "
+                    "Date(1500000000000),\"number\":123,\"string\":\"cat\"}"));
+  });
 });

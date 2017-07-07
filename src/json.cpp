@@ -49,13 +49,11 @@ public:
   void operator()(jsdate d) {
     auto date_time = d.to_tm();
     auto ms = d.time_since_epoch() % std::chrono::seconds{1};
-    // TODO: figure out what to do here, probably:
-    // https://stackoverflow.com/questions/10286204/the-right-json-date-format
     constexpr size_t buff_size = 128;
     char buffer[buff_size];
     size_t bytes = snprintf(buffer,
                             buff_size,
-                            "%d-%02d-%02dT%02d:%02d:%02d.%03ldZ",
+                            "\"%d-%02d-%02dT%02d:%02d:%02d.%03ldZ\"",
                             date_time.tm_year + 1900,
                             date_time.tm_mon + 1,
                             date_time.tm_mday,
@@ -97,14 +95,70 @@ public:
     util::write_all(writer_, "}");
   }
 
-private:
   writer *writer_;
+};
+
+class js_visitor {
+public:
+  explicit js_visitor(writer *w) : visitor_(w) {}
+
+  void operator()(jsdate d) {
+    util::write_all(visitor_.writer_, "new Date(");
+    util::write_all(
+        visitor_.writer_,
+        std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(
+                           d.time_since_epoch())
+                           .count()));
+    util::write_all(visitor_.writer_, ")");
+  }
+
+  void operator()(double t) { visitor_(t); }
+  void operator()(bool t) { visitor_(t); }
+  void operator()(jsstring t) { visitor_(t); }
+
+  void operator()(jsarray_view a) {
+    util::write_all(visitor_.writer_, "[");
+    bool first = true;
+    for (auto js : a) {
+      if (first) {
+        first = false;
+      } else {
+        util::write_all(visitor_.writer_, ",");
+      }
+      js.visit(*this);
+    }
+    util::write_all(visitor_.writer_, "]");
+  }
+
+  void operator()(jsobject_view o) {
+    util::write_all(visitor_.writer_, "{");
+    bool first = true;
+    for (auto[k, v] : o) {
+      if (first) {
+        first = false;
+      } else {
+        util::write_all(visitor_.writer_, ",");
+      }
+      (*this)(k);
+      util::write_all(visitor_.writer_, ":");
+      v.visit(*this);
+    }
+    util::write_all(visitor_.writer_, "}");
+  }
+
+private:
+  json_visitor visitor_;
 };
 
 }  // anonymous namespace
 
 void to_json(jsvalue v, writer *w) {
   json_visitor visitor(w);
+  v.visit(visitor);
+}
+
+void to_js(jsvalue v, writer *w) {
+  js_visitor visitor(w);
   v.visit(visitor);
 }
 

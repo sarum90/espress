@@ -62,7 +62,7 @@ private:
 // N.B. Only supports UTC.
 class jsdate {
 public:
-  explicit jsdate(std::chrono::milliseconds time_since_epoch)
+  jsdate(std::chrono::milliseconds time_since_epoch)
       : time_since_epoch_(time_since_epoch) {}
 
   inline ::tm to_tm() {

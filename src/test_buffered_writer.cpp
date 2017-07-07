@@ -1,7 +1,5 @@
 #include "buffered_writer.hpp"
 
-#include <mettle.hpp>
-
 #include "test/common.hpp"
 
 using namespace espress;

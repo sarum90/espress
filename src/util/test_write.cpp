@@ -1,7 +1,5 @@
 #include "util/write.hpp"
 
-#include <mettle.hpp>
-
 #include "test/common.hpp"
 
 using namespace espress;
