@@ -41,4 +41,9 @@ pipe& pipe::operator=(pipe&& other) {
   other.write_fd_ = -1;
   return (*this);
 }
+
+void pipe::reset() {
+  pipe unused(std::move(*this));
+}
+
 }

@@ -47,13 +47,13 @@ test_suite<> pipe_tests("tests for pipe utilities", [](auto &_) {
   _.test("invalid moved pipe", []() {
     espress::pipe p1;
     espress::pipe p{std::move(p1)};
-    expect([&]() { p1.writer(); }, thrown<std::runtime_error>());
+    expect([&]() { p1.writer(); }, thrown<util::assertion_error>());
   });
 
   _.test("invalid moved pipe two", []() {
     espress::pipe p1;
     espress::pipe p;
     p = std::move(p1);
-    expect([&]() { p1.writer(); }, thrown<std::runtime_error>());
+    expect([&]() { p1.writer(); }, thrown<util::assertion_error>());
   });
 });

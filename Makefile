@@ -3,7 +3,8 @@ CXX=g++-7
 COMMON_FILES= \
 	json.cpp \
 	jsvalue.cpp \
-	pipe.cpp
+	pipe.cpp \
+	subprocess.cpp
 
 FILES= \
   $(COMMON_FILES) \
@@ -22,6 +23,7 @@ TEST_EXECUTABLES = \
 	test_pipe \
 	test_reader \
 	test_writer \
+	test_subprocess \
 	util/test_assert \
 	util/test_read \
 	util/test_write
@@ -50,7 +52,7 @@ travis: test coverage check-format
 
 .PHONY: test
 test: $(TEST_EXECUTABLES_LOC)
-	mettle $(TEST_EXECUTABLES_LOC)
+	mettle --timeout 400 --show-terminal $(TEST_EXECUTABLES_LOC)
 
 .PHONY: coverage
 coverage: out/cov/gcov.stdout

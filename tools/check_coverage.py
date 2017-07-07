@@ -53,7 +53,7 @@ def process(output, summary_dir):
             with open(p) as report:
                 for line in report.readlines():
                     e, l, line = line.split(':', 2)
-                    if '#' not in e:
+                    if e.strip().isdigit() or e.strip() == '-':
                         continue
                     print '%s:%d: Line not covered by tests.' % (fn, int(l))
     cp = os.path.commonprefix(files)

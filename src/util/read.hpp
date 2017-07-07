@@ -11,7 +11,7 @@ inline void read_all(reader *r, read_buffer s) {
   while (i < s.size()) {
     int readed = r->read(s.substr(i));
     if (readed < 1) {
-      throw std::runtime_error("Failed to read even a single byte.");
+      throw std::runtime_error("Unexpected EOF.");
     }
     i += readed;
   }
