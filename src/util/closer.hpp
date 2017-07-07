@@ -6,8 +6,8 @@ namespace espress {
 namespace util {
 
 class closer {
-  public:
-  closer(int fd): fd_(fd) {}
+public:
+  closer(int fd) : fd_(fd) {}
   ~closer() { close(); }
 
   inline void close() {
@@ -19,5 +19,5 @@ private:
   int fd_;
 };
 
-} // namespace util
-} // namespace espress
+}  // namespace util
+}  // namespace espress

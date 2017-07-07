@@ -17,10 +17,10 @@ public:
   ~subprocess() noexcept(false);
 
   // writer to write to stdin.
-  writer* std_in() {return &std_in_;}
+  writer* std_in() { return &std_in_; }
 
   // reader to read from stdout.
-  reader* std_out() {return &std_out_;}
+  reader* std_out() { return &std_out_; }
 
 private:
   subprocess(int stdin_fd, int stdout_fd, pid_t child_pid);

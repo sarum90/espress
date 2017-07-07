@@ -13,13 +13,9 @@ public:
 
   static inline void pipe(int fd[2]) { check_retval(syscalls::pipe(fd)); }
 
-  static inline pid_t fork() {
-    return check_retval(syscalls::fork());
-  }
+  static inline pid_t fork() { return check_retval(syscalls::fork()); }
 
-  static inline int dup(int fd) {
-    return check_retval(syscalls::dup(fd));
-  }
+  static inline int dup(int fd) { return check_retval(syscalls::dup(fd)); }
 
   static inline int dup2(int fd, int newfd) {
     return check_retval(syscalls::dup2(fd, newfd));
@@ -29,10 +25,11 @@ public:
     return check_retval(syscalls::waitpid(pid, status, options));
   }
 
-  static inline int execvpe(const char *file, char *const argv[], char *const envp[]) {
+  static inline int execvpe(const char *file,
+                            char *const argv[],
+                            char *const envp[]) {
     return check_retval(syscalls::execvpe(file, argv, envp));
   }
-
 
 private:
   template <class T>

@@ -42,8 +42,5 @@ pipe& pipe::operator=(pipe&& other) {
   return (*this);
 }
 
-void pipe::reset() {
-  pipe unused(std::move(*this));
-}
-
+void pipe::reset() { pipe unused(std::move(*this)); }
 }

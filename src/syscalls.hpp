@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 namespace espress {
 
@@ -30,7 +30,9 @@ struct syscalls {
     return ::waitpid(pid, status, options);
   }
 
-  static inline int execvpe(const char *file, char *const argv[], char *const envp[]) {
+  static inline int execvpe(const char *file,
+                            char *const argv[],
+                            char *const envp[]) {
     return ::execvpe(file, argv, envp);
   }
 };

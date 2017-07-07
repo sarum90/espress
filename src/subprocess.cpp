@@ -1,6 +1,6 @@
 
-#include <iostream>
 #include <unistd.h>
+#include <iostream>
 
 #include "checked_syscalls.hpp"
 #include "coverage.hpp"
@@ -8,13 +8,12 @@
 
 namespace espress {
 
-subprocess::subprocess(int stdin_fd, int stdout_fd, pid_t child_pid):
-  std_in_(stdin_fd),
-  std_out_(stdout_fd),
-  child_pid_(child_pid),
-  stdin_closer_(stdin_fd),
-  stdout_closer_(stdout_fd)
-  {}
+subprocess::subprocess(int stdin_fd, int stdout_fd, pid_t child_pid)
+    : std_in_(stdin_fd),
+      std_out_(stdout_fd),
+      child_pid_(child_pid),
+      stdin_closer_(stdin_fd),
+      stdout_closer_(stdout_fd) {}
 
 subprocess::~subprocess() noexcept(false) {
   int res = 0;
@@ -24,8 +23,10 @@ subprocess::~subprocess() noexcept(false) {
     return;
   }
   // TODO: replace these assertions with custom exceptions.
-  util::eassert(WIFEXITED(res), "subprocess did not exit normally (killed, coredumped, ...)");
-  util::eassert(WEXITSTATUS(res) == 0, "subprocess exited with non-zero status.");
+  util::eassert(WIFEXITED(res),
+                "subprocess did not exit normally (killed, coredumped, ...)");
+  util::eassert(WEXITSTATUS(res) == 0,
+                "subprocess exited with non-zero status.");
 }
 
 subprocess subprocess::create(std::vector<std::string> args) {
@@ -40,9 +41,9 @@ subprocess subprocess::create(std::vector<std::string> args) {
     // Clean up remaining fds from the pipes:
     std_out.reset();
     std_in.reset();
-    
+
     std::vector<char *> argv;
-    for (auto &s: args) {
+    for (auto &s : args) {
       argv.push_back(&s[0]);
     }
     argv.push_back(nullptr);
@@ -52,10 +53,11 @@ subprocess subprocess::create(std::vector<std::string> args) {
     try {
       checked_syscalls::execvpe(argv[0], &argv[0], &envp[0]);
     } catch (...) {
-      coverage_before_exit(); std::terminate();
+      coverage_before_exit();
+      std::terminate(); // COVERAGE_MISS_OK
     }
   }
   return subprocess(std_in.dup_write(), std_out.dup_read(), child);
 }
 
-} // namespace espress
+}  // namespace espress
