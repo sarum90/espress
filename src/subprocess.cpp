@@ -54,7 +54,7 @@ subprocess subprocess::create(std::vector<std::string> args) {
       checked_syscalls::execvpe(argv[0], &argv[0], &envp[0]);
     } catch (...) {
       coverage_before_exit();
-      std::terminate(); // COVERAGE_MISS_OK
+      std::terminate();  // COVERAGE_MISS_OK
     }
   }
   return subprocess(std_in.dup_write(), std_out.dup_read(), child);

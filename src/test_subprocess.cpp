@@ -33,7 +33,7 @@ test_suite<> subprocess_test("tests for subprocess", [](auto &_) {
         []() {
           auto subp =
               subprocess::create({"i-hope-this-isnt-a-command-in-path"});
-        }, // COVERAGE_MISS_OK
+        },  // COVERAGE_MISS_OK
         thrown<util::assertion_error>());
   });
 
