@@ -12,5 +12,5 @@ public:
   constexpr static bool is_binary_operator = false;
 };
 
-} // namespace operators
-} // namespace espress
+}  // namespace operators
+}  // namespace espress

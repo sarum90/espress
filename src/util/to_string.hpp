@@ -14,5 +14,5 @@ inline std::string to_string(double d) {
   return std::string(buffer, s);
 }
 
-} // namespace util
-} // namespace espress
+}  // namespace util
+}  // namespace espress

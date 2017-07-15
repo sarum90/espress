@@ -15,13 +15,9 @@ class json_visitor {
 public:
   explicit json_visitor(writer *w) : writer_(w) {}
 
-  void operator()(jsundefined u) {
-    util::write_all(writer_, "null");
-  }
+  void operator()(jsundefined u) { util::write_all(writer_, "null"); }
 
-  void operator()(jsnull n) {
-    util::write_all(writer_, "null");
-  }
+  void operator()(jsnull n) { util::write_all(writer_, "null"); }
 
   void operator()(double d) {
     auto s = util::to_string(d);
@@ -113,7 +109,9 @@ class js_visitor {
 public:
   explicit js_visitor(writer *w) : visitor_(w) {}
 
-  void operator()(jsundefined t) { util::write_all(visitor_.writer_, "undefined"); }
+  void operator()(jsundefined t) {
+    util::write_all(visitor_.writer_, "undefined");
+  }
   void operator()(jsnull t) { visitor_(t); }
   void operator()(double t) { visitor_(t); }
   void operator()(bool t) { visitor_(t); }

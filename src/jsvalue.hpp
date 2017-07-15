@@ -1,11 +1,11 @@
 #pragma once
 
 #include <chrono>
+#include <iostream>
 #include <map>
 #include <string_view>
 #include <variant>
 #include <vector>
-#include <iostream>
 
 #include "util/assert.hpp"
 
@@ -33,13 +33,19 @@ public:
 
   std::string_view string_view() { return string_; }
 
-  inline bool operator<(const jsstring &other) const {
+  inline bool operator<(const jsstring& other) const {
     return string_ < other.string_;
   }
 
-  inline bool operator==(const jsstring& other) const { return string_ == other.string_; }
-  inline bool operator==(const std::string& other) const { return string_ == other; }
-  inline bool operator==(const std::string_view& other) const { return string_ == other; }
+  inline bool operator==(const jsstring& other) const {
+    return string_ == other.string_;
+  }
+  inline bool operator==(const std::string& other) const {
+    return string_ == other;
+  }
+  inline bool operator==(const std::string_view& other) const {
+    return string_ == other;
+  }
 
 private:
   friend std::ostream& operator<<(std::ostream& os, const jsstring& obj);
@@ -50,13 +56,12 @@ inline std::ostream& operator<<(std::ostream& os, const jsstring& obj) {
   return (os << obj.string_);
 }
 
-
 class jsarray_view {
 public:
   typedef std::vector<jsvalue>::iterator iterator;
   typedef std::vector<jsvalue>::const_iterator const_iterator;
 
-  jsarray_view(jsarray *array) : array_(array) {}
+  jsarray_view(jsarray* array) : array_(array) {}
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -64,14 +69,14 @@ public:
   bool operator==(const jsarray_view& other) const;
 
 private:
-  jsarray *array_;
+  jsarray* array_;
 };
 
 class jsobject_view {
 public:
   typedef std::map<jsstring, jsvalue>::const_iterator const_iterator;
 
-  jsobject_view(jsobject *object) : object_(object) {}
+  jsobject_view(jsobject* object) : object_(object) {}
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -79,7 +84,7 @@ public:
   bool operator==(const jsobject_view& other) const;
 
 private:
-  jsobject *object_;
+  jsobject* object_;
 };
 
 // Javascript Date representation.
@@ -134,24 +139,20 @@ public:
   static jsvalue array(jsarray_view a) { return jsvalue(a); }
   static jsvalue object(jsobject_view o) { return jsvalue(o); }
 
-  inline bool operator==(const jsvalue& v) const {
-    return value_ == v.value_;
-  }
+  inline bool operator==(const jsvalue& v) const { return value_ == v.value_; }
 
   // Visit this value, argument must be a visitor that can handle all types
   // that value_ can take.
   template <class T>
-  inline decltype(auto) visit(T &&t) {
+  inline decltype(auto) visit(T&& t) {
     return std::visit(std::forward<T>(t), value_);
   }
 
-  jsstring as_string() const {
-    return std::get<jsstring>(value_);
-  }
+  jsstring as_string() const { return std::get<jsstring>(value_); }
 
 private:
   template <class T>
-  explicit jsvalue(T &&t) : value_(std::forward<T>(t)){};
+  explicit jsvalue(T&& t) : value_(std::forward<T>(t)){};
 
   std::variant<jsundefined,   // Javascript undefined
                jsnull,        // Javascript null
@@ -164,7 +165,8 @@ private:
                >
       value_;
 };
-static_assert(sizeof(jsvalue) == 24, "jsvalue should not be larger than 24 bytes.");
+static_assert(sizeof(jsvalue) == 24,
+              "jsvalue should not be larger than 24 bytes.");
 
 // Representation of a javascript array.
 class jsarray {

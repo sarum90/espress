@@ -36,7 +36,7 @@ inline size_t read_to(reader *r, char c, read_buffer s) {
       throw std::runtime_error("Unexpected EOF.");
     }
     i += readed;
-    for(;ii < i; ii++) {
+    for (; ii < i; ii++) {
       if (buff[ii] == c) {
         return i;
       }

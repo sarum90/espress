@@ -9,13 +9,10 @@ namespace operators {
 
 class plus : public binary_operator<plus> {
 public:
-  constexpr static char * js_operator = "+";
-
   inline static double evaluate(double l, double r, eval_context *c) {
     return l + r;
   }
-
 };
 
-} // namespace operators
-} // namespace espress
+}  // namespace operators
+}  // namespace espress

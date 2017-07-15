@@ -33,7 +33,8 @@ test_suite<> subprocess_test("tests for subprocess", [](auto &_) {
     std::string out(in.size(), '\0');
     std::string varname{"MY_VAR_PROBABLY_UNSET"};
 
-    auto subp = subprocess::create({"bash", "-c", "echo \"$" + varname + "\""}, {{varname, in}});
+    auto subp = subprocess::create({"bash", "-c", "echo \"$" + varname + "\""},
+                                   {{varname, in}});
     util::read_all(subp.std_out(), out);
     expect(out, equal_to(in));
   });
