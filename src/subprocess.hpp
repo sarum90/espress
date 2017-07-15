@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "pipe.hpp"
 #include "reader.hpp"
@@ -11,7 +12,7 @@ namespace espress {
 
 class subprocess {
 public:
-  static subprocess create(std::vector<std::string> args);
+  static subprocess create(std::vector<std::string> args, std::map<std::string, std::string> env);
 
   // waits for subprocess.
   ~subprocess() noexcept(false);

@@ -53,6 +53,7 @@ def process(output, summary_dir):
             p = os.path.join(summary_dir, x.report)
             covered_lines = 0
             miss_lines = 0
+            known = False
             with open(p) as report:
                 for line in report.readlines():
                     e, l, line = line.split(':', 2)
@@ -64,14 +65,17 @@ def process(output, summary_dir):
                     if e.strip().isdigit():
                         covered_lines += 1
                         continue
+                    known = True
                     print '%s:%d: Line not covered by tests.' % (fn, int(l))
 
             total_lines = miss_lines + covered_lines
             if total_lines == x.total_lines and (
-                    covered_lines * 10000 / total_lines == x.percentage * 100):
+                    abs(covered_lines * 10000 / total_lines - x.percentage * 100) <= 1): # within .01%
                 print "%s %d/%d lines intentionally missed: %.02f%%->100%%" % (
                         fn, miss_lines, total_lines, x.percentage)
             else:
+                if not known:
+                    print "%s:0: unknown missing coverage (BUG in tools/check_coverage.py, look at files in out/cov/ to investigate)" % fn
                 full_coverage = False
     cp = os.path.commonprefix(files)
     allfiles = set([os.path.join(x[0], y) for x in os.walk(cp) for y in x[2] if y.endswith('.cpp') and y not in _NOCOV_FILES])

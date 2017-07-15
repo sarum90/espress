@@ -5,6 +5,7 @@
 #include <string_view>
 #include <variant>
 #include <vector>
+#include <iostream>
 
 #include "util/assert.hpp"
 
@@ -14,11 +15,21 @@ class jsarray;
 class jsobject;
 class jsvalue;
 
+struct jsundefined {
+  bool operator==(const jsundefined& v) const { return true; }
+};
+
+struct jsnull {
+  bool operator==(const jsnull& v) const { return true; }
+};
+
 // Javascript string representation. Does not own the underlying string.
 class jsstring {
 public:
   template <int N>
   jsstring(const char (&c)[N]) : string_{c, N - 1} {}
+
+  jsstring(std::string_view s) : string_(s) {}
 
   std::string_view string_view() { return string_; }
 
@@ -26,9 +37,19 @@ public:
     return string_ < other.string_;
   }
 
+  inline bool operator==(const jsstring& other) const { return string_ == other.string_; }
+  inline bool operator==(const std::string& other) const { return string_ == other; }
+  inline bool operator==(const std::string_view& other) const { return string_ == other; }
+
 private:
+  friend std::ostream& operator<<(std::ostream& os, const jsstring& obj);
   std::string_view string_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const jsstring& obj) {
+  return (os << obj.string_);
+}
+
 
 class jsarray_view {
 public:
@@ -39,6 +60,8 @@ public:
 
   const_iterator begin() const;
   const_iterator end() const;
+
+  bool operator==(const jsarray_view& other) const;
 
 private:
   jsarray *array_;
@@ -52,6 +75,8 @@ public:
 
   const_iterator begin() const;
   const_iterator end() const;
+
+  bool operator==(const jsobject_view& other) const;
 
 private:
   jsobject *object_;
@@ -85,6 +110,10 @@ public:
     return time_since_epoch_;
   }
 
+  inline bool operator==(const jsdate& other) const {
+    return time_since_epoch_ == other.time_since_epoch_;
+  }
+
 private:
   std::chrono::milliseconds time_since_epoch_;
 };
@@ -96,12 +125,18 @@ private:
 // TODO: Fancy memory annotations to help catch use-after-frees.
 class jsvalue {
 public:
+  static jsvalue undefined() { return jsvalue(jsundefined{}); }
+  static jsvalue null() { return jsvalue(jsnull{}); }
   static jsvalue boolean(bool b) { return jsvalue(b); }
   static jsvalue number(double d) { return jsvalue(d); }
   static jsvalue string(jsstring s) { return jsvalue(s); }
   static jsvalue date(jsdate d) { return jsvalue(d); }
   static jsvalue array(jsarray_view a) { return jsvalue(a); }
   static jsvalue object(jsobject_view o) { return jsvalue(o); }
+
+  inline bool operator==(const jsvalue& v) const {
+    return value_ == v.value_;
+  }
 
   // Visit this value, argument must be a visitor that can handle all types
   // that value_ can take.
@@ -110,11 +145,17 @@ public:
     return std::visit(std::forward<T>(t), value_);
   }
 
+  jsstring as_string() const {
+    return std::get<jsstring>(value_);
+  }
+
 private:
   template <class T>
   explicit jsvalue(T &&t) : value_(std::forward<T>(t)){};
 
-  std::variant<bool,          // Javascript boolean
+  std::variant<jsundefined,   // Javascript undefined
+               jsnull,        // Javascript null
+               bool,          // Javascript boolean
                double,        // Javascript number
                jsstring,      // Javascript string
                jsdate,        // Javascript date
@@ -123,6 +164,7 @@ private:
                >
       value_;
 };
+static_assert(sizeof(jsvalue) == 24, "jsvalue should not be larger than 24 bytes.");
 
 // Representation of a javascript array.
 class jsarray {

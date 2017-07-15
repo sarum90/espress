@@ -1,6 +1,7 @@
 CXX=g++-7
 
 COMMON_FILES= \
+	operators/to_string.cpp \
 	json.cpp \
 	jsvalue.cpp \
 	pipe.cpp \
@@ -16,6 +17,8 @@ CXXCOVFLAGS=-std=c++17 -O0 --coverage -g -DCOVERAGE -I ../../src/ -Wall -Werror
 TESTFLAGS=-lmettle
 
 TEST_EXECUTABLES = \
+	operators/test_to_string \
+	test/test_log_test \
 	test_buffered_writer \
 	test_checked_syscalls \
 	test_json \

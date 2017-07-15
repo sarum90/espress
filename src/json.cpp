@@ -1,7 +1,9 @@
 #include "json.hpp"
 
+#include <iostream>
 #include <stdexcept>
 
+#include "util/to_string.hpp"
 #include "util/variant.hpp"
 #include "util/write.hpp"
 
@@ -13,15 +15,17 @@ class json_visitor {
 public:
   explicit json_visitor(writer *w) : writer_(w) {}
 
+  void operator()(jsundefined u) {
+    util::write_all(writer_, "null");
+  }
+
+  void operator()(jsnull n) {
+    util::write_all(writer_, "null");
+  }
+
   void operator()(double d) {
-    long int i = d;
-    if (i == d) {
-      auto s = std::to_string(i);
-      util::write_all(writer_, s);
-    } else {
-      auto s = std::to_string(d);
-      util::write_all(writer_, s);
-    }
+    auto s = util::to_string(d);
+    util::write_all(writer_, s);
   }
 
   void operator()(bool b) { util::write_all(writer_, b ? "true" : "false"); }
@@ -31,16 +35,23 @@ public:
     std::string_view remaining = s.string_view();
     size_t escaped_pos = 0;
     while (remaining.size() > 0) {
-      auto p = remaining.find_first_of("\"\\", escaped_pos);
+      auto p = remaining.find_first_of("\"\\\n", escaped_pos);
       if (p == std::string_view::npos) {
         util::write_all(writer_, remaining);
         remaining = std::string_view{};
       } else {
         util::write_all(writer_, remaining.substr(0, p));
-        util::write_all(writer_, "\\");
+        if (remaining[p] == '\n') {
+          util::write_all(writer_, "\\n");
+          p++;
+          // We haven't looked at anything beyond remaining[p].
+          escaped_pos = 0;
+        } else {
+          util::write_all(writer_, "\\");
+          // We've already escaped the first character (for \ and ")
+          escaped_pos = 1;
+        }
         remaining = remaining.substr(p);
-        // We've already escaped the first character now.
-        escaped_pos = 1;
       }
     }
     util::write_all(writer_, "\"");
@@ -102,6 +113,12 @@ class js_visitor {
 public:
   explicit js_visitor(writer *w) : visitor_(w) {}
 
+  void operator()(jsundefined t) { util::write_all(visitor_.writer_, "undefined"); }
+  void operator()(jsnull t) { visitor_(t); }
+  void operator()(double t) { visitor_(t); }
+  void operator()(bool t) { visitor_(t); }
+  void operator()(jsstring t) { visitor_(t); }
+
   void operator()(jsdate d) {
     util::write_all(visitor_.writer_, "new Date(");
     util::write_all(
@@ -111,10 +128,6 @@ public:
                            .count()));
     util::write_all(visitor_.writer_, ")");
   }
-
-  void operator()(double t) { visitor_(t); }
-  void operator()(bool t) { visitor_(t); }
-  void operator()(jsstring t) { visitor_(t); }
 
   void operator()(jsarray_view a) {
     util::write_all(visitor_.writer_, "[");

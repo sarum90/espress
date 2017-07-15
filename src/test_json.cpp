@@ -18,10 +18,23 @@ struct buffer : public writer {
 };
 
 test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
+  _.test("null", []() {
+    buffer b;
+    to_json(jsvalue::null(), &b);
+    expect(b.data, equal_to("null"));
+  });
+
+  _.test("undefined", []() {
+    buffer b;
+    to_json(jsvalue::undefined(), &b);
+    expect(b.data, equal_to("null"));
+  });
+
   _.test("number", []() {
     buffer b;
-    to_json(jsvalue::number(12.345678), &b);
-    expect(b.data, equal_to("12.345678"));
+    // TODO: enhance this testing.
+    to_json(jsvalue::number(12.3456), &b);
+    expect(b.data, equal_to("12.3456"));
   });
 
   _.test("bool", []() {
@@ -89,6 +102,8 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
     a1.push_back(jsvalue::boolean(true));
     a1.push_back(jsvalue::string("\\mouse\""));
     a1.push_back(jsvalue::number(1e12));
+    a1.push_back(jsvalue::undefined());
+    a1.push_back(jsvalue::null());
     jsobject o1;
     o1.set("arr", jsvalue::array(&a1));
     o1.set("num", jsvalue::number(-12.125));
@@ -113,8 +128,8 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
                "{\"_cde_\":false,"
                "\"a\":["
                "{\"arr\":[\"2017-07-14T02:40:00.000Z\",true,\"\\\\mouse\\\"\","
-               "1000000000000],"
-               "\"bool\":true,\"num\":-12.125000},"
+               "1000000000000,null,null],"
+               "\"bool\":true,\"num\":-12.125},"
                "[\"Hello World!\"]],"
                "\"b\":{\"abc123e\":-12345,\"cat\":\"mouse\"}}"));
   });
@@ -124,6 +139,8 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
     jsarray a;
     a.push_back(jsvalue::boolean(true));
     a.push_back(jsvalue::boolean(false));
+    a.push_back(jsvalue::undefined());
+    a.push_back(jsvalue::null());
     jsobject o;
     o.set("array", jsvalue::array(&a));
     o.set("number", jsvalue::number(123));
@@ -131,7 +148,7 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
     o.set("string", jsvalue::string("cat"));
     to_js(jsvalue::object(&o), &b);
     expect(b.data,
-           equal_to("{\"array\":[true,false],\"date\":new "
+           equal_to("{\"array\":[true,false,undefined,null],\"date\":new "
                     "Date(1500000000000),\"number\":123,\"string\":\"cat\"}"));
   });
 });

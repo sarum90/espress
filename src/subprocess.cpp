@@ -29,7 +29,7 @@ subprocess::~subprocess() noexcept(false) {
                 "subprocess exited with non-zero status.");
 }
 
-subprocess subprocess::create(std::vector<std::string> args) {
+subprocess subprocess::create(std::vector<std::string> args, std::map<std::string, std::string> env) {
   pipe std_in;
   pipe std_out;
   pid_t child = checked_syscalls::fork();
@@ -47,10 +47,18 @@ subprocess subprocess::create(std::vector<std::string> args) {
       argv.push_back(&s[0]);
     }
     argv.push_back(nullptr);
+
     std::vector<char *> envp;
+    std::vector<std::string> envp_strings;
+    for (auto [k, v] : env) {
+      std::string s = k + "=" + v;
+      envp_strings.push_back(s);
+      envp.push_back(&envp_strings[envp_strings.size()-1][0]);
+    }
     envp.push_back(nullptr);
     file_writer w(STDOUT_FILENO);
     try {
+      coverage_before_exit();
       checked_syscalls::execvpe(argv[0], &argv[0], &envp[0]);
     } catch (...) {
       coverage_before_exit();
