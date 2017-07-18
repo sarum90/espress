@@ -197,8 +197,10 @@ public:
   void operator()(jsstring t) { visitor_(t); }
 
   void operator()(jsdate d) {
-    util::write_all(visitor_.writer_, "{\"__espress__\":\"Date\",\"__value__\":");
-    util::write_all(visitor_.writer_, util::to_string(d.time_since_epoch().count()));
+    util::write_all(visitor_.writer_,
+                    "{\"__espress__\":\"Date\",\"__value__\":");
+    util::write_all(visitor_.writer_,
+                    util::to_string(d.time_since_epoch().count()));
     util::write_all(visitor_.writer_, "}");
   }
 

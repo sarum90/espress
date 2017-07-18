@@ -2,8 +2,8 @@
 
 #include <chrono>
 #include <cmath>
-#include <iostream>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <string_view>
 #include <variant>
@@ -49,9 +49,7 @@ public:
     return string_ == other;
   }
 
-  inline size_t size() const {
-    return string_.size();
-  }
+  inline size_t size() const { return string_.size(); }
 
 private:
   friend std::ostream& operator<<(std::ostream& os, const jsstring& obj);
@@ -129,7 +127,6 @@ private:
   std::chrono::milliseconds time_since_epoch_;
 };
 
-
 // Copy-by-value implementation of a javascript value.
 //
 // Javascript arrays, objects, and lists are not owned.
@@ -184,8 +181,8 @@ private:
                >
       value_;
 
-  template <class T> 
-  friend jsvalue visit(T&&t, jsvalue a1, jsvalue a2);
+  template <class T>
+  friend jsvalue visit(T&& t, jsvalue a1, jsvalue a2);
 };
 static_assert(sizeof(jsvalue) == 24,
               "jsvalue should not be larger than 24 bytes.");
@@ -224,7 +221,7 @@ private:
 };
 
 template <class T>
-jsvalue visit(T&&t, jsvalue a1, jsvalue a2) {
+jsvalue visit(T&& t, jsvalue a1, jsvalue a2) {
   return std::visit(std::forward<T>(t), a1.value_, a2.value_);
 }
 

@@ -4,8 +4,8 @@
 
 #include "eval_context.hpp"
 #include "jsvalue.hpp"
-#include "operators/to_string.hpp"
 #include "operators/to_number.hpp"
+#include "operators/to_string.hpp"
 
 namespace espress {
 namespace operators {
@@ -39,10 +39,12 @@ struct plus_type_traits<jsobject_view> {
 
 class plus_visitor {
 public:
-  plus_visitor(eval_context * c): context_(c){}
+  plus_visitor(eval_context *c) : context_(c) {}
 
   template <class T, class U>
-  std::enable_if_t<!plus_type_traits<T>::prefers_string && !plus_type_traits<U>::prefers_string, jsvalue>
+  std::enable_if_t<!plus_type_traits<T>::prefers_string &&
+                       !plus_type_traits<U>::prefers_string,
+                   jsvalue>
   operator()(T l, U r) {
     double a = to_number::evaluate(l, context_);
     double b = to_number::evaluate(r, context_);
@@ -50,7 +52,9 @@ public:
   }
 
   template <class T, class U>
-  std::enable_if_t<plus_type_traits<T>::prefers_string || plus_type_traits<U>::prefers_string, jsvalue>
+  std::enable_if_t<plus_type_traits<T>::prefers_string ||
+                       plus_type_traits<U>::prefers_string,
+                   jsvalue>
   operator()(T l, U r) {
     // TODO: We should instead pass some sort of short-lived context here.
     jsstring a = to_string::evaluate(l, context_);
@@ -61,11 +65,10 @@ public:
   }
 
 private:
-  eval_context * context_;
-
+  eval_context *context_;
 };
 
-} // anonymous anonymous
+}  // anonymous anonymous
 
 class plus : public binary_operator<plus> {
 public:

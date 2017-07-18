@@ -26,20 +26,21 @@ inline std::string to_string(double d) {
   char buffer[buffer_size];
   size_t s = snprintf(buffer, buffer_size, "%f", d);
   size_t new_s = s;
-  while (new_s > 0 && buffer[new_s-1] == '0') {
+  while (new_s > 0 && buffer[new_s - 1] == '0') {
     new_s--;
   }
   for (size_t i = 1; i < new_s; i++) {
     if (buffer[i] == '.') {
       if (i + 1 == new_s) {
-        return std::string(buffer, new_s-1);
+        return std::string(buffer, new_s - 1);
       }
       return std::string(buffer, new_s);
     }
   }
-  util::eassert( // COVERAGE_MISS_OK
-      false, "printf %f produced something without a '.'"); // COVERAGE_MISS_OK
-  return std::string{}; // COVERAGE_MISS_OK
+  util::eassert(  // COVERAGE_MISS_OK
+      false,
+      "printf %f produced something without a '.'");  // COVERAGE_MISS_OK
+  return std::string{};                               // COVERAGE_MISS_OK
 }
 
 }  // namespace util

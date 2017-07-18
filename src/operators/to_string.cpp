@@ -20,7 +20,7 @@ jsstring to_string_visitor::operator()(jsarray_view a) {
   return context_->add_string(std::move(result));
 }
 
-} // namespace detail
+}  // namespace detail
 
 jsvalue to_string::evaluate(jsvalue v, eval_context *c) {
   detail::to_string_visitor visitor(c);

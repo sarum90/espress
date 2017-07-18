@@ -7,8 +7,8 @@
 #include "eval_context.hpp"
 #include "util/variant.hpp"
 
-#include "json.hpp"
 #include <type_traits>
+#include "json.hpp"
 
 using namespace espress;
 using namespace mettle;

@@ -58,7 +58,7 @@ travis: test coverage check-format
 
 .PHONY: test
 test: $(TEST_EXECUTABLES_LOC)
-	mettle --timeout 2000 --show-terminal $(TEST_EXECUTABLES_LOC)
+	mettle --timeout 5000 --show-terminal $(TEST_EXECUTABLES_LOC)
 
 # Slower than make test, but should leave you in a gdb session, helps for debugging segfaults.
 .PHONY: gdb

@@ -4,7 +4,6 @@
 #include "operators/unary_operator.hpp"
 #include "util/to_string.hpp"
 
-
 namespace espress {
 namespace operators {
 
@@ -59,11 +58,10 @@ private:
 
 }  // namespace detail
 
-
 class to_string : public unary_operator<to_string> {
 public:
   // Note: assumes timezone is UTC.
-  static jsvalue evaluate(jsvalue v, eval_context* c);
+  static jsvalue evaluate(jsvalue v, eval_context *c);
 
   template <class T>
   static jsstring evaluate(T t, eval_context *c) {
