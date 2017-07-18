@@ -37,15 +37,17 @@ test_suite<> to_string_tests("tests to_string", [](auto &_) {
     eval_context bigc;
     for (auto j : test::get_complex_values(&bigc)) {
       buffer b;
+      util::write_all(&b, "((");
       to_js(j, &b);
-      util::write_all(&b, " + \"\"");
+      util::write_all(&b, ") + \"\")");
 
+      std::cerr << std::endl;
       file_writer fw(2);
       to_js(j, &fw);
 
       eval_context c;
       buffer b2;
-      to_json(operators::to_string::evaluate(j, &c), &b2);
+      to_espress_json(operators::to_string::evaluate(j, &c), &b2);
       expect(b2.string(), equal_to(nr.run(b.string())));
     }
   });

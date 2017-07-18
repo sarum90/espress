@@ -1,6 +1,7 @@
 CXX=g++-7
 
 COMMON_FILES= \
+	operators/to_number.cpp \
 	operators/to_string.cpp \
 	json.cpp \
 	jsvalue.cpp \
@@ -17,6 +18,8 @@ CXXCOVFLAGS=-std=c++17 -O0 --coverage -g -DCOVERAGE -I ../../src/ -Wall -Werror
 TESTFLAGS=-lmettle
 
 TEST_EXECUTABLES = \
+	operators/test_plus \
+	operators/test_to_number \
 	operators/test_to_string \
 	test/test_log_test \
 	test_buffered_writer \
@@ -55,7 +58,12 @@ travis: test coverage check-format
 
 .PHONY: test
 test: $(TEST_EXECUTABLES_LOC)
-	mettle --timeout 400 --show-terminal $(TEST_EXECUTABLES_LOC)
+	mettle --timeout 2000 --show-terminal $(TEST_EXECUTABLES_LOC)
+
+# Slower than make test, but should leave you in a gdb session, helps for debugging segfaults.
+.PHONY: gdb
+gdb: $(TEST_EXECUTABLES_LOC)
+	bash -c 'for a in $(TEST_EXECUTABLES_LOC); do gdb -ex run -ex quit --args $$a --no-subproc || exit -1; done'
 
 .PHONY: coverage
 coverage: out/cov/gcov.stdout

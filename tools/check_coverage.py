@@ -45,6 +45,7 @@ def gcov_chunks(filename):
 def process(output, summary_dir):
     full_coverage = True
     files = set()
+    printed = False
     for c in gcov_chunks(output):
         x = handle_chunk(c)
         fn = os.path.normpath(os.path.join(summary_dir, x.filename))
@@ -66,6 +67,9 @@ def process(output, summary_dir):
                         covered_lines += 1
                         continue
                     known = True
+                    if not printed:
+                        printed = True
+                        print "If any of the following are benign, add a comment with COVERAGE_MISS_OK"
                     print '%s:%d: Line not covered by tests.' % (fn, int(l))
 
             total_lines = miss_lines + covered_lines

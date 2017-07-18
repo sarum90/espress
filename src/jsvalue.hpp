@@ -1,7 +1,9 @@
 #pragma once
 
 #include <chrono>
+#include <cmath>
 #include <iostream>
+#include <functional>
 #include <map>
 #include <string_view>
 #include <variant>
@@ -45,6 +47,10 @@ public:
   }
   inline bool operator==(const std::string_view& other) const {
     return string_ == other;
+  }
+
+  inline size_t size() const {
+    return string_.size();
   }
 
 private:
@@ -123,6 +129,7 @@ private:
   std::chrono::milliseconds time_since_epoch_;
 };
 
+
 // Copy-by-value implementation of a javascript value.
 //
 // Javascript arrays, objects, and lists are not owned.
@@ -139,7 +146,19 @@ public:
   static jsvalue array(jsarray_view a) { return jsvalue(a); }
   static jsvalue object(jsobject_view o) { return jsvalue(o); }
 
-  inline bool operator==(const jsvalue& v) const { return value_ == v.value_; }
+  // Used for testing equivalence in tests. Things it does different than JS:
+  //  - Recursively compares arrays and objects (deep equality).
+  //  - NaN == NaN is true, not false.
+  inline bool operator==(const jsvalue& v) const {
+    if (auto l = std::get_if<double>(&value_)) {
+      if (auto r = std::get_if<double>(&v.value_)) {
+        if (std::isnan(*l) && std::isnan(*r)) {
+          return true;
+        }
+      }
+    }
+    return value_ == v.value_;
+  }
 
   // Visit this value, argument must be a visitor that can handle all types
   // that value_ can take.
@@ -164,6 +183,9 @@ private:
                jsobject_view  // Javascript object
                >
       value_;
+
+  template <class T> 
+  friend jsvalue visit(T&&t, jsvalue a1, jsvalue a2);
 };
 static_assert(sizeof(jsvalue) == 24,
               "jsvalue should not be larger than 24 bytes.");
@@ -200,5 +222,10 @@ private:
   // that / handle method calls.
   std::map<jsstring, jsvalue> key_values_;
 };
+
+template <class T>
+jsvalue visit(T&&t, jsvalue a1, jsvalue a2) {
+  return std::visit(std::forward<T>(t), a1.value_, a2.value_);
+}
 
 }  // namespace espress

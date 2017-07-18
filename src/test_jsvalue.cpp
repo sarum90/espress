@@ -5,6 +5,10 @@
 #include "test/log_test.hpp"
 
 #include "eval_context.hpp"
+#include "util/variant.hpp"
+
+#include "json.hpp"
+#include <type_traits>
 
 using namespace espress;
 using namespace mettle;

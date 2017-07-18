@@ -11,8 +11,8 @@ namespace util {
 //
 //   std::visit(
 //    util::overloaded{
-//      [](bool b){ return b ? "true" : "false"; }
-//      [](double d){ return std::to_string(d); }
+//      [](bool b){ return b ? "true" : "false"; },
+//      [](double d){ return std::to_string(d); },
 //      [](auto c){ throw std::runtime_error("unhandled type."}
 //    }, variant_object);
 //
