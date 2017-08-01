@@ -22,11 +22,5 @@ double to_number_visitor::operator()(jsarray_view a) {
 }
 
 }  // namespace detail
-
-jsvalue to_number::evaluate(jsvalue v, eval_context *c) {
-  detail::to_number_visitor visitor(c);
-  return jsvalue::number(v.visit(visitor));
-}
-
 }  // namespace operators
 }  // namespace espress

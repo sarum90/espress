@@ -134,6 +134,9 @@ private:
 // TODO: Fancy memory annotations to help catch use-after-frees.
 class jsvalue {
 public:
+  template <typename T>
+  static jsvalue make(T t) { return jsvalue{t}; }
+
   static jsvalue undefined() { return jsvalue(jsundefined{}); }
   static jsvalue null() { return jsvalue(jsnull{}); }
   static jsvalue boolean(bool b) { return jsvalue(b); }

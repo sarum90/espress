@@ -77,15 +77,10 @@ private:
 
 }  // namespace detail
 
-class to_number : public unary_operator<to_number> {
-public:
-  static jsvalue evaluate(jsvalue v, eval_context *c);
 
-  template <class T>
-  static double evaluate(T t, eval_context *c) {
-    detail::to_number_visitor visitor(c);
-    return visitor(t);
-  }
+class to_number : public auto_unary_operator<to_number, double> {
+public:
+  typedef detail::to_number_visitor visitor;
 };
 
 }  // namespace operators
