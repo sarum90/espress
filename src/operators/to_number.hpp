@@ -77,8 +77,7 @@ private:
 
 }  // namespace detail
 
-
-class to_number : public auto_unary_operator<to_number, double> {
+class to_number : public unary_operator<to_number, double> {
 public:
   typedef detail::to_number_visitor visitor;
 };

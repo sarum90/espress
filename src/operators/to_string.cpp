@@ -21,11 +21,5 @@ jsstring to_string_visitor::operator()(jsarray_view a) {
 }
 
 }  // namespace detail
-
-jsvalue to_string::evaluate(jsvalue v, eval_context *c) {
-  detail::to_string_visitor visitor(c);
-  return jsvalue::string(v.visit(visitor));
-}
-
 }  // namespace operators
 }  // namespace espress

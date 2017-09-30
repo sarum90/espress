@@ -135,7 +135,9 @@ private:
 class jsvalue {
 public:
   template <typename T>
-  static jsvalue make(T t) { return jsvalue{t}; }
+  static jsvalue make(T t) {
+    return jsvalue{t};
+  }
 
   static jsvalue undefined() { return jsvalue(jsundefined{}); }
   static jsvalue null() { return jsvalue(jsnull{}); }

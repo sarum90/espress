@@ -2,6 +2,7 @@
 
 #include "eval_context.hpp"
 #include "operators/unary_operator.hpp"
+#include "util/assert.hpp"
 #include "util/to_string.hpp"
 
 namespace espress {
@@ -29,6 +30,7 @@ public:
     auto t = d.to_tm();
     size_t s = strftime(
         buffer, buffer_size, "%a %b %d %Y %H:%M:%S GMT+0000 (UTC)", &t);
+    util::eassert(s < buffer_size, "strftime went off the end of the buffer.");
     return context_->add_string(std::string(buffer, s));
   }
   jsstring operator()(jsarray_view a);
@@ -58,16 +60,10 @@ private:
 
 }  // namespace detail
 
-class to_string : public unary_operator<to_string> {
+class to_string : public unary_operator<to_string, jsstring> {
 public:
   // Note: assumes timezone is UTC.
-  static jsvalue evaluate(jsvalue v, eval_context *c);
-
-  template <class T>
-  static jsstring evaluate(T t, eval_context *c) {
-    detail::to_string_visitor visitor(c);
-    return visitor(t);
-  }
+  typedef detail::to_string_visitor visitor;
 };
 
 }  // namespace operators

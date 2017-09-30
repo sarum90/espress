@@ -5,17 +5,10 @@
 namespace espress {
 namespace operators {
 
-template <class sub>
+struct variable_return_type {};
+
+template <class sub, class return_type = variable_return_type>
 class unary_operator {
-public:
-  constexpr static bool is_unary_operator = true;
-  constexpr static bool is_binary_operator = false;
-};
-
-struct variable_return_type{};
-
-template <class sub, class return_type=variable_return_type>
-class auto_unary_operator {
 public:
   constexpr static bool is_unary_operator = true;
   constexpr static bool is_binary_operator = false;
@@ -30,17 +23,16 @@ public:
     typename sub::visitor visitor(c);
     return jsvalue::make(v.visit(visitor));
   }
-
 };
 
 template <class sub>
-class auto_unary_operator<sub, variable_return_type> {
+class unary_operator<sub, variable_return_type> {
 public:
   constexpr static bool is_unary_operator = true;
   constexpr static bool is_binary_operator = false;
 
   template <class T>
-  static jsvalue evaluate(T&& v, eval_context *c) {
+  static jsvalue evaluate(T &&v, eval_context *c) {
     typename sub::visitor visitor(c);
     return jsvalue::make(v.visit(visitor));
   }
