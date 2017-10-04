@@ -37,7 +37,7 @@ public:
     std::string_view remaining = s.string_view();
     size_t escaped_pos = 0;
     while (remaining.size() > 0) {
-      auto p = remaining.find_first_of("\"\\\n\t", escaped_pos);
+      auto p = remaining.find_first_of("\"\\\n\t\b\r\f", escaped_pos);
       if (p == std::string_view::npos) {
         util::write_all(writer_, remaining);
         remaining = std::string_view{};
@@ -50,6 +50,21 @@ public:
           escaped_pos = 0;
         } else if (remaining[p] == '\t') {
           util::write_all(writer_, "\\t");
+          p++;
+          // We haven't looked at anything beyond remaining[p].
+          escaped_pos = 0;
+        } else if (remaining[p] == '\b') {
+          util::write_all(writer_, "\\b");
+          p++;
+          // We haven't looked at anything beyond remaining[p].
+          escaped_pos = 0;
+        } else if (remaining[p] == '\r') {
+          util::write_all(writer_, "\\r");
+          p++;
+          // We haven't looked at anything beyond remaining[p].
+          escaped_pos = 0;
+        } else if (remaining[p] == '\f') {
+          util::write_all(writer_, "\\f");
           p++;
           // We haven't looked at anything beyond remaining[p].
           escaped_pos = 0;
@@ -419,7 +434,7 @@ jsvalue parse_json_impl(auto& it, const auto& end, eval_context* c) {
     return jsvalue::null();
   }
   util::eassert(false, "Unknown character found during JSON parsing.");
-  return jsvalue::null();
+  return jsvalue::null(); // COVERAGE_MISS_OK
 }
 }
 

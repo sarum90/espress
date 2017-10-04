@@ -229,20 +229,38 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
   _.test("test json_parse whitespace", []() {
     node_runner nr;
     eval_context bigc;
-    for (std::string_view j : {"{ \"cat\": [null, 1 , true]}", "[ { }   ]"}) {
+    for (std::string_view j : {
+        "{ \"cat\": [null, 1 , true]}",
+        "[ { }   ]",
+        "\"|\\b|\\f|\\n|\\t|\"",
+        "\"|\\r|\\\\|\\\"\""
+        }) {
       buffer b;
       util::write_all(&b, "JSON.parse(");
       to_js(jsvalue::string(j), &b);
       util::write_all(&b, ")");
 
-      std::cout << b.string() << std::endl;
-
       buffer out;
       eval_context c;
       to_espress_json(parse_json(j, &c), &out);
 
-      std::cout << out.string() << std::endl;
       expect(out.string(), equal_to(nr.run(b.string())));
+    }
+  });
+
+  _.test("test json_parse invalid", []() {
+    node_runner nr;
+    eval_context bigc;
+    for (std::string_view j : {
+        "\"\\Q\"",
+        "happy"}) {
+      buffer b;
+      util::write_all(&b, "JSON.parse(");
+      to_js(jsvalue::string(j), &b);
+      util::write_all(&b, ")");
+
+      eval_context c;
+      expect([&]() { parse_json(j, &c); }, thrown<util::assertion_error>());
     }
   });
 });
