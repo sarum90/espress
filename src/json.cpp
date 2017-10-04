@@ -11,11 +11,11 @@ namespace espress {
 
 namespace {
 
-jsvalue parse_json_impl(auto& it, const auto& end, eval_context * c);
+jsvalue parse_json_impl(auto& it, const auto& end, eval_context* c);
 
 class json_visitor {
 public:
-  explicit json_visitor(writer *w) : writer_(w) {}
+  explicit json_visitor(writer* w) : writer_(w) {}
 
   void operator()(jsundefined u) { util::write_all(writer_, "null"); }
 
@@ -113,12 +113,12 @@ public:
     util::write_all(writer_, "}");
   }
 
-  writer *writer_;
+  writer* writer_;
 };
 
 class js_visitor {
 public:
-  explicit js_visitor(writer *w) : visitor_(w) {}
+  explicit js_visitor(writer* w) : visitor_(w) {}
 
   void operator()(jsundefined t) {
     util::write_all(visitor_.writer_, "undefined");
@@ -176,7 +176,7 @@ private:
 
 class espress_json_visitor {
 public:
-  explicit espress_json_visitor(writer *w) : visitor_(w) {}
+  explicit espress_json_visitor(writer* w) : visitor_(w) {}
 
   void operator()(jsundefined t) {
     util::write_all(visitor_.writer_, "{\"__espress__\":\"undef\"}");
@@ -242,17 +242,17 @@ private:
 
 }  // anonymous namespace
 
-void to_json(jsvalue v, writer *w) {
+void to_json(jsvalue v, writer* w) {
   json_visitor visitor(w);
   v.visit(visitor);
 }
 
-void to_espress_json(jsvalue v, writer *w) {
+void to_espress_json(jsvalue v, writer* w) {
   espress_json_visitor visitor(w);
   v.visit(visitor);
 }
 
-void to_js(jsvalue v, writer *w) {
+void to_js(jsvalue v, writer* w) {
   js_visitor visitor(w);
   v.visit(visitor);
 }
@@ -260,13 +260,8 @@ void to_js(jsvalue v, writer *w) {
 namespace {
 
 void consume_whitespace(auto& it, const auto& end) {
-  while(
-      it != end && (
-        *it == ' ' ||
-        *it == '\n' ||
-        *it == '\t' ||
-        *it == '\r')
-  ) {
+  while (it != end &&
+         (*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')) {
     it++;
   }
 }
@@ -358,11 +353,11 @@ std::string parse_string(auto& it, const auto& end) {
   }
 }
 
-jsarray_view parse_array(auto& it, const auto& end, eval_context * c) {
+jsarray_view parse_array(auto& it, const auto& end, eval_context* c) {
   util::eassert(*it == '[', "Arrays must start with '['.");
   ++it;
   auto& res = c->add_array();
-  while(true) {
+  while (true) {
     consume_whitespace(it, end);
     util::eassert(it != end, "End of string before end of array.");
     if (*it == ']') {
@@ -377,11 +372,11 @@ jsarray_view parse_array(auto& it, const auto& end, eval_context * c) {
   }
 }
 
-jsobject_view parse_object(auto& it, const auto& end, eval_context * c) {
+jsobject_view parse_object(auto& it, const auto& end, eval_context* c) {
   util::eassert(*it == '{', "Objects must start with '{'.");
   ++it;
   auto& res = c->add_object();
-  while(true) {
+  while (true) {
     consume_whitespace(it, end);
     util::eassert(it != end, "End of string before end of object.");
     if (*it == '}') {
@@ -402,7 +397,7 @@ jsobject_view parse_object(auto& it, const auto& end, eval_context * c) {
   }
 }
 
-jsvalue parse_json_impl(auto& it, const auto& end, eval_context * c) {
+jsvalue parse_json_impl(auto& it, const auto& end, eval_context* c) {
   consume_whitespace(it, end);
   util::eassert(it != end, "Not enough string to json parser");
   if (*it == '-') {
@@ -426,10 +421,9 @@ jsvalue parse_json_impl(auto& it, const auto& end, eval_context * c) {
   util::eassert(false, "Unknown character found during JSON parsing.");
   return jsvalue::null();
 }
-
 }
 
-jsvalue parse_json(std::string_view s, eval_context * c) {
+jsvalue parse_json(std::string_view s, eval_context* c) {
   auto it = s.begin();
   auto ret = parse_json_impl(it, s.end(), c);
   return ret;
