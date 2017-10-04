@@ -434,7 +434,7 @@ jsvalue parse_json_impl(auto& it, const auto& end, eval_context* c) {
     return jsvalue::null();
   }
   util::eassert(false, "Unknown character found during JSON parsing.");
-  return jsvalue::null(); // COVERAGE_MISS_OK
+  return jsvalue::null();  // COVERAGE_MISS_OK
 }
 }
 

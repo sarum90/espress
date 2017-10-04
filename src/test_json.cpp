@@ -229,12 +229,10 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
   _.test("test json_parse whitespace", []() {
     node_runner nr;
     eval_context bigc;
-    for (std::string_view j : {
-        "{ \"cat\": [null, 1 , true]}",
-        "[ { }   ]",
-        "\"|\\b|\\f|\\n|\\t|\"",
-        "\"|\\r|\\\\|\\\"\""
-        }) {
+    for (std::string_view j : {"{ \"cat\": [null, 1 , true]}",
+                               "[ { }   ]",
+                               "\"|\\b|\\f|\\n|\\t|\"",
+                               "\"|\\r|\\\\|\\\"\""}) {
       buffer b;
       util::write_all(&b, "JSON.parse(");
       to_js(jsvalue::string(j), &b);
@@ -251,9 +249,7 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
   _.test("test json_parse invalid", []() {
     node_runner nr;
     eval_context bigc;
-    for (std::string_view j : {
-        "\"\\Q\"",
-        "happy"}) {
+    for (std::string_view j : {"\"\\Q\"", "happy"}) {
       buffer b;
       util::write_all(&b, "JSON.parse(");
       to_js(jsvalue::string(j), &b);
