@@ -11,6 +11,8 @@ namespace espress {
 
 namespace {
 
+jsvalue parse_json_impl(auto& it, const auto& end, eval_context * c);
+
 class json_visitor {
 public:
   explicit json_visitor(writer *w) : writer_(w) {}
@@ -253,6 +255,184 @@ void to_espress_json(jsvalue v, writer *w) {
 void to_js(jsvalue v, writer *w) {
   js_visitor visitor(w);
   v.visit(visitor);
+}
+
+namespace {
+
+void consume_whitespace(auto& it, const auto& end) {
+  while(
+      it != end && (
+        *it == ' ' ||
+        *it == '\n' ||
+        *it == '\t' ||
+        *it == '\r')
+  ) {
+    it++;
+  }
+}
+
+bool parse_matches(auto& it, const auto& end, std::string_view str) {
+  auto it2 = str.begin();
+  while (true) {
+    if (it2 == str.end()) return true;
+    if (it == end) return false;
+    if (*it != *it2) return false;
+    ++it;
+    ++it2;
+  }
+}
+
+double parse_number(auto& it, const auto& end) {
+  double res = 0;
+  while (it != end) {
+    char c = *it;
+    if (c <= '9' && c >= '0') {
+      res *= 10;
+      res += c - '0';
+    } else {
+      break;
+    }
+    ++it;
+  }
+  if (it != end && *it == '.') {
+    ++it;
+    double mult = 0.1;
+    while (it != end) {
+      char c = *it;
+      if (c <= '9' && c >= '0') {
+        double add = c - '0';
+        res += add * mult;
+        mult = mult / 10;
+      } else {
+        break;
+      }
+      ++it;
+    }
+  }
+  return res;
+}
+
+std::string parse_string(auto& it, const auto& end) {
+  std::string ret;
+  util::eassert(*it == '"', "strings must start with '\"'");
+  ++it;
+
+  while (true) {
+    util::eassert(it != end, "strings must end with '\"'");
+    if (*it == '"') {
+      ++it;
+      return ret;
+    }
+    if (*it == '\\') {
+      ++it;
+      util::eassert(it != end, "unexpected end of string.");
+      switch (*it) {
+        case '"':
+          ret += '"';
+          break;
+        case '\\':
+          ret += '\\';
+          break;
+        case 'b':
+          ret += '\b';
+          break;
+        case 'f':
+          ret += '\f';
+          break;
+        case 'n':
+          ret += '\n';
+          break;
+        case 't':
+          ret += '\t';
+          break;
+        case 'r':
+          ret += '\r';
+          break;
+        default:
+          util::eassert(false, "invalid escape sequence in JSON string.");
+      }
+    } else {
+      ret += *it;
+    }
+    ++it;
+  }
+}
+
+jsarray_view parse_array(auto& it, const auto& end, eval_context * c) {
+  util::eassert(*it == '[', "Arrays must start with '['.");
+  ++it;
+  auto& res = c->add_array();
+  while(true) {
+    consume_whitespace(it, end);
+    util::eassert(it != end, "End of string before end of array.");
+    if (*it == ']') {
+      ++it;
+      return jsarray_view{&res};
+    }
+    res.push_back(parse_json_impl(it, end, c));
+    consume_whitespace(it, end);
+    if (it != end && *it == ',') {
+      ++it;
+    }
+  }
+}
+
+jsobject_view parse_object(auto& it, const auto& end, eval_context * c) {
+  util::eassert(*it == '{', "Objects must start with '{'.");
+  ++it;
+  auto& res = c->add_object();
+  while(true) {
+    consume_whitespace(it, end);
+    util::eassert(it != end, "End of string before end of object.");
+    if (*it == '}') {
+      ++it;
+      return jsobject_view{&res};
+    }
+    auto key = c->add_string(parse_string(it, end));
+    consume_whitespace(it, end);
+    if (it != end && *it == ':') {
+      ++it;
+    }
+    auto val = parse_json_impl(it, end, c);
+    res.set(key, val);
+    consume_whitespace(it, end);
+    if (it != end && *it == ',') {
+      ++it;
+    }
+  }
+}
+
+jsvalue parse_json_impl(auto& it, const auto& end, eval_context * c) {
+  consume_whitespace(it, end);
+  util::eassert(it != end, "Not enough string to json parser");
+  if (*it == '-') {
+    ++it;
+    return jsvalue::number(-parse_number(it, end));
+  } else if (*it <= '9' && *it >= '0') {
+    return jsvalue::number(parse_number(it, end));
+  } else if (*it == '"') {
+    return jsvalue::string(c->add_string(parse_string(it, end)));
+  } else if (*it == '[') {
+    return jsvalue::array(parse_array(it, end, c));
+  } else if (*it == '{') {
+    return jsvalue::object(parse_object(it, end, c));
+  } else if (parse_matches(it, end, "true")) {
+    return jsvalue::boolean(true);
+  } else if (parse_matches(it, end, "false")) {
+    return jsvalue::boolean(false);
+  } else if (parse_matches(it, end, "null")) {
+    return jsvalue::null();
+  }
+  util::eassert(false, "Unknown character found during JSON parsing.");
+  return jsvalue::null();
+}
+
+}
+
+jsvalue parse_json(std::string_view s, eval_context * c) {
+  auto it = s.begin();
+  auto ret = parse_json_impl(it, s.end(), c);
+  return ret;
 }
 
 }  // namespace espress

@@ -205,4 +205,44 @@ test_suite<> json_test_suite("test suite for json encoding", [](auto &_) {
       expect(b2.string(), equal_to(nr.run(b.string())));
     }
   });
+
+  _.test("test json_parse", []() {
+    node_runner nr;
+    eval_context bigc;
+    for (auto j : test::get_complex_values(&bigc)) {
+      buffer b2;
+      to_json(j, &b2);
+
+      buffer b;
+      util::write_all(&b, "JSON.parse(");
+      to_js(jsvalue::string(b2.string()), &b);
+      util::write_all(&b, ")");
+
+      buffer out;
+      eval_context c;
+      to_espress_json(parse_json(b2.string(), &c), &out);
+
+      expect(out.string(), equal_to(nr.run(b.string())));
+    }
+  });
+
+  _.test("test json_parse whitespace", []() {
+    node_runner nr;
+    eval_context bigc;
+    for (std::string_view j : {"{ \"cat\": [null, 1 , true]}", "[ { }   ]"}) {
+      buffer b;
+      util::write_all(&b, "JSON.parse(");
+      to_js(jsvalue::string(j), &b);
+      util::write_all(&b, ")");
+
+      std::cout << b.string() << std::endl;
+
+      buffer out;
+      eval_context c;
+      to_espress_json(parse_json(j, &c), &out);
+
+      std::cout << out.string() << std::endl;
+      expect(out.string(), equal_to(nr.run(b.string())));
+    }
+  });
 });

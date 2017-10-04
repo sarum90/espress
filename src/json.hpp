@@ -3,6 +3,7 @@
 // project includes:
 #include "jsvalue.hpp"
 #include "writer.hpp"
+#include "eval_context.hpp"
 
 namespace espress {
 
@@ -18,4 +19,9 @@ void to_espress_json(jsvalue v, writer *w);
 // Identical to to_json, except for dates, which are written `new
 // Date(ms_since_epoch)`
 void to_js(jsvalue v, writer *w);
+
+// Parse a JSON string s into a jsvalue
+// Use the provided eval_context to create strings/arrays/objects.
+jsvalue parse_json(std::string_view s, eval_context *c);
+
 }
